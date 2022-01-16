@@ -4,6 +4,7 @@ import os
 import random
 from datetime import datetime
 from dotenv import load_dotenv
+
 load_dotenv()
 
 # bot twitter account access keys and authentication
@@ -17,12 +18,13 @@ auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth, wait_on_rate_limit=True)
 
 # target tweeter account
-userId = "longneaux"
+userId = os.environ.get('TARGET_ID')
+
 
 # get last 10 tweets excludings retweets & replies
 def get_tweets():
     timeline = api.user_timeline(screen_name=userId,
-                                 count=10,
+                                 count=15,
                                  include_rts=False,
                                  exclude_replies=True,
                                  tweet_mode="extended"
@@ -56,8 +58,10 @@ def is_tweet_replied(tweet_id):
 # main loop
 def loop():
     tweets = get_tweets()
+
     for tweet in tweets:
         if not is_tweet_replied(tweet.id):
+
             write_id(tweet.id)
             write_log(tweet.id)
             rand = random.randint(1, 15)
@@ -71,6 +75,7 @@ def loop():
 
 # the bot checks every x hours for new tweets to answer
 if __name__ == "__main__":
+    print("bot started")
     while True:
         loop()
-        time.sleep(7200)
+        time.sleep(6800)
