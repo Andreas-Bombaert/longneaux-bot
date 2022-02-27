@@ -22,7 +22,7 @@ userId = os.environ.get('TARGET_ID')
 # get last 10 tweets excludings retweets & replies
 def get_tweets():
     timeline = api.user_timeline(screen_name=userId,
-                                 count=10,
+                                 count=100,
                                  include_rts=False,
                                  exclude_replies=True,
                                  tweet_mode="extended"
@@ -60,7 +60,7 @@ def loop():
         if not is_tweet_replied(tweet.id):
             write_id(tweet.id)
             write_log(tweet.id)
-            rand = random.randint(1, 15)
+            rand = random.randint(1, 36)
             img_source = "media/" + str(rand) + ".jpg"
             status_txt = "@longneaux malédiction numéro " + str(rand)
             api.update_status_with_media(filename=img_source, status=status_txt, in_reply_to_status_id=tweet.id)

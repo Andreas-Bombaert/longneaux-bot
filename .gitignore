@@ -3,3 +3,6 @@ media
 logs
 replied.txt
 .idea
+analyse/word_counts.csv
+analyse/analysed.txt
+README.md
