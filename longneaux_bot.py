@@ -1,9 +1,14 @@
 import tweepy
 import time
 import os
-import random
 from datetime import datetime
 from dotenv import load_dotenv
+import json
+import random
+import imghdr
+import urllib.request
+import urllib.parse
+
 load_dotenv()
 
 # bot twitter account access keys and authentication
@@ -18,6 +23,34 @@ api = tweepy.API(auth, wait_on_rate_limit=True)
 
 # target tweeter account
 userId = os.environ.get('TARGET_ID')
+
+# google image search credentials
+API_KEY = os.environ.get('GIS_API')
+SEARCH_ENGINE_ID = os.environ.get('GIS_CX')
+
+image_name = ""
+
+
+def search_image(query):
+    request = urllib.request.Request(
+        'https://www.googleapis.com/customsearch/v1?key=' + API_KEY + '&cx=' +
+        SEARCH_ENGINE_ID + '&q=' + query + '&searchType=image')
+
+    with urllib.request.urlopen(request) as f:
+        data = f.read().decode('utf-8')
+
+    data = json.loads(data)
+    results = data['items']
+    url = random.choice(results)['link']
+    urllib.request.urlretrieve(url, './' + query)
+    imagetype = imghdr.what('./' + query)
+
+    global image_name
+    image_name = './' + query + '.' + imagetype
+    if not type(imagetype) is None:
+        os.rename('./' + query, './' + query + '.' + imagetype)
+        image_name = './' + query + '.' + imagetype
+
 
 # get last 10 tweets excludings retweets & replies
 def get_tweets():
@@ -60,10 +93,16 @@ def loop():
         if not is_tweet_replied(tweet.id):
             write_id(tweet.id)
             write_log(tweet.id)
-            rand = random.randint(1, 36)
-            img_source = "media/" + str(rand) + ".jpg"
-            status_txt = "@longneaux malédiction numéro " + str(rand)
+
+            word_list = tweet.full_text.split(" ")
+            rand = word_list[random.randint(0, len(word_list))-1]
+            search_image(rand)
+
+            img_source = "./" + image_name
+            status_txt = "@longneaux malédiction nulle basée sur le mot  " + rand
             api.update_status_with_media(filename=img_source, status=status_txt, in_reply_to_status_id=tweet.id)
+
+            os.remove("./" + image_name)
 
         else:
             pass

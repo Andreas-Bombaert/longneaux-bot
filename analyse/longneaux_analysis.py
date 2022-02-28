@@ -1,12 +1,8 @@
 import csv
 
 import tweepy
-import time
 import os
 import matplotlib.pyplot as plt
-from openpyxl import Workbook
-from openpyxl.utils import get_column_letter
-from datetime import datetime
 from dotenv import load_dotenv
 from collections import Counter
 
@@ -194,12 +190,12 @@ def avg_words_per_tweet(tweets):
 
 def run():
     # tweets = get_tweets()
-    # data = count_words(process_tweets(tweets))
-    # write_to_csv(data[1])
+    data = count_words(process_tweets(get_all_tweets()))
+    write_to_csv(data[1])
     # to_pie(top_x(20))
     # print(time_average(get_all_tweets()))
     # print(avg_words_per_tweet(get_all_tweets()))
-    avg_hours_to_chart(get_all_tweets())
+    # avg_hours_to_chart(get_all_tweets())
 
 
 # the bot checks every x hours for new tweets to analyse
